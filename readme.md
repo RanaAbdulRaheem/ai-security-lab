@@ -45,9 +45,9 @@ pip install requests garak pyrit chromadb sentence-transformers pandas
 ollama pull llama3.1:8b
 ollama serve  # in a separate terminal
 
-python chatbot.py       # Module A - support chatbot
-python ingest.py        # Module B - build the RAG vector store
-python query.py         # Module B - query the RAG assistant
-python agents.py        # Module C - multi-agent system
-python analyze.py       # Module D - log analysis
+python chatbot.py      
+python ingest.py        
+python query.py        
+python agents.py        
+python analyze.py      
 ```
