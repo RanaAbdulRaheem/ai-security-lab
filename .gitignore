@@ -1,0 +1,11 @@
+@"
+.env
+*.env
+venv/
+.venv/
+__pycache__/
+*.gguf
+*.bin
+*.safetensors
+models/
+"@ | Out-File -Encoding utf8 .gitignore

@@ -1,0 +1,3 @@
+Asset ID 1042: Dell Latitude 5420 laptop, assigned to J. Rivera, Finance dept.
+Asset ID 1043: iPhone 14, assigned to M. Chen, IT dept.
+Asset ID 1044: Server rack unit B7, Data Center 2, contains internal API credentials store.

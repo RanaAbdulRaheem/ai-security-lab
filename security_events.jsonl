@@ -1,0 +1,3 @@
+{"timestamp": "2026-09-08T04:28:53.619399", "event_type": "test_event", "details": {"message": "logger is working"}}
+{"timestamp": "2026-09-08T04:30:38.187075", "event_type": "impersonation_attempt", "details": {"claimed_sender": "escalation_agent", "role": "it_admin", "tool": "inventory"}}
+{"timestamp": "2026-09-08T04:32:17.949715", "event_type": "tool_call_denied", "details": {"role": "it_admin", "tool": "inventory", "reason": "untrusted_data_trigger"}}
