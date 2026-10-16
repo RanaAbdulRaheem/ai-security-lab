@@ -1,6 +1,8 @@
 # AI Security Assurance Lab
 
-A small fictional company's AI stack - a support chatbot, a document-search assistant, and a multi-agent support system - built, red-teamed, fixed, and monitored. Every tool used is free and open-source (Ollama, Garak, PyRIT, ChromaDB, sentence-transformers).
+I wanted to learn how AI systems actually get attacked, and how to defend them, so I built a small fake company's AI tools and then tried to break them.
+
+The "company" has three AI systems: a customer support chatbot, a document-search assistant, and a team of AI agents that handle support requests. I attacked each one, fixed what broke, and re-tested to prove the fixes worked. Everything runs locally with free, open-source tools (Ollama, Garak, PyRIT, ChromaDB, sentence-transformers).
 
 ## What this project demonstrates
 
