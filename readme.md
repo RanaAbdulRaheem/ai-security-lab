@@ -1,6 +1,6 @@
 # AI Security Assurance Lab
 
-A small fictional company's AI stack — a support chatbot, a document-search assistant, and a multi-agent support system — built, red-teamed, fixed, and monitored. Every tool used is free and open-source (Ollama, Garak, PyRIT, ChromaDB, sentence-transformers).
+A small fictional company's AI stack - a support chatbot, a document-search assistant, and a multi-agent support system - built, red-teamed, fixed, and monitored. Every tool used is free and open-source (Ollama, Garak, PyRIT, ChromaDB, sentence-transformers).
 
 ## What this project demonstrates
 
@@ -13,11 +13,11 @@ A small fictional company's AI stack — a support chatbot, a document-search as
 
 ## Architecture
 
-**Target 1 — Support chatbot** (`chatbot.py`): a FinTrust Bank customer support assistant with a planted fake secret (`INTERNAL_API_KEY`), used to test whether prompt injection and jailbreak attempts could extract it.
+**Target 1 - Support chatbot** (`chatbot.py`): a FinTrust Bank customer support assistant with a planted fake secret (`INTERNAL_API_KEY`), used to test whether prompt injection and jailbreak attempts could extract it.
 
-**Target 2 — RAG assistant** (`ingest.py`, `query.py`): a document-search system over a mix of general and confidential company documents, with role-based access control (`employee` vs `hr`) enforced at retrieval time, not just in the prompt.
+**Target 2 - RAG assistant** (`ingest.py`, `query.py`): a document-search system over a mix of general and confidential company documents, with role-based access control (`employee` vs `hr`) enforced at retrieval time, not just in the prompt.
 
-**Target 3 — Multi-agent system** (`agents.py`, `tools.py`): a Router Agent that classifies incoming requests and hands them to one of three specialist agents (Ticketing, Inventory, Escalation), each with its own role-based permissions and session-token verification between agents.
+**Target 3 - Multi-agent system** (`agents.py`, `tools.py`): a Router Agent that classifies incoming requests and hands them to one of three specialist agents (Ticketing, Inventory, Escalation), each with its own role-based permissions and session-token verification between agents.
 
 ## Key findings
 
@@ -27,8 +27,6 @@ A small fictional company's AI stack — a support chatbot, a document-search as
 | R2 | Cross-agent injection attempt against the Inventory Agent | C | High (attempted) | Blocked by existing role + untrusted-data checks |
 | R3 | Agent impersonation — a forged `sender` field returned real inventory data with no identity verification | C | Critical | **Fixed & retested** (see traceability diagram) |
 | R4 | Confused deputy — a malicious instruction embedded in ticket content, no active exploit yet but a real latent attack surface | C | Low (latent) | Identified, documented |
-
-R3 is the project's strongest result: a full before/after showing the model getting fooled by a forged message, but the system's session-token verification blocking the resulting action anyway. See `report/traceability-diagram.png`.
 
 ## What I built vs. what the tools did
 
@@ -51,7 +49,3 @@ python query.py         # Module B - query the RAG assistant
 python agents.py        # Module C - multi-agent system
 python analyze.py       # Module D - log analysis
 ```
-
-## Full report
-
-See `report/findings-report.md` for the complete write-up: methodology, all attack attempts (including ones that failed to find anything), OWASP/MITRE mappings, and the full risk register.
