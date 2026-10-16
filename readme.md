@@ -9,7 +9,7 @@ A small fictional company's AI stack - a support chatbot, a document-search assi
 - Designing and attacking a multi-agent system (router + ticketing + inventory + escalation agents), including agent-to-agent trust attacks
 - Mapping every finding to OWASP LLM Top 10 and MITRE ATLAS
 - Building detection rules and an incident response playbook
-- Tracing one finding end-to-end: attack → risk register → control → evidence → fix → retest → closed
+- Tracing one finding end-to-end: attack -> risk register -> control -> evidence -> fix -> retest -> closed
 
 ## Architecture
 
