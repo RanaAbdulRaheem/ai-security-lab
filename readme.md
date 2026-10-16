@@ -4,50 +4,60 @@ I wanted to learn how AI systems actually get attacked, and how to defend them, 
 
 The "company" has three AI systems: a customer support chatbot, a document-search assistant, and a team of AI agents that handle support requests. I attacked each one, fixed what broke, and re-tested to prove the fixes worked. Everything runs locally with free, open-source tools (Ollama, Garak, PyRIT, ChromaDB, sentence-transformers).
 
-## What this project demonstrates
+> All company data in `docs/` is made up for testing, including the "CONFIDENTIAL" files.
 
-- Red-teaming an LLM chatbot for prompt injection, jailbreaks, and data leakage (Garak, PyRIT)
-- Securing a RAG (retrieval-augmented generation) system against indirect prompt injection and cross-tenant data leakage
-- Designing and attacking a multi-agent system (router + ticketing + inventory + escalation agents), including agent-to-agent trust attacks
-- Mapping every finding to OWASP LLM Top 10 and MITRE ATLAS
-- Building detection rules and an incident response playbook
-- Tracing one finding end-to-end: attack -> risk register -> control -> evidence -> fix -> retest -> closed
+## What I did
 
-## Architecture
+- Attacked a chatbot with prompt injection and jailbreaks to see if it would leak a secret (using Garak and PyRIT)
+- Secured a document-search (RAG) system so users can't see documents they're not allowed to, even with tricky prompts
+- Built a multi-agent system and tested whether one agent could trick or impersonate another
+- Mapped every issue to the OWASP LLM Top 10 and MITRE ATLAS
+- Wrote detection rules and an incident response playbook
+- Followed one issue all the way through: attack → logged the risk → added a fix → re-tested → closed
 
-**Target 1 - Support chatbot** (`chatbot.py`): a FinTrust Bank customer support assistant with a planted fake secret (`INTERNAL_API_KEY`), used to test whether prompt injection and jailbreak attempts could extract it.
+## The three systems
 
-**Target 2 - RAG assistant** (`ingest.py`, `query.py`): a document-search system over a mix of general and confidential company documents, with role-based access control (`employee` vs `hr`) enforced at retrieval time, not just in the prompt.
+**1. Support chatbot** (`chatbot.py`)
+A bank support assistant with a fake secret (`INTERNAL_API_KEY`) hidden in it. The test: can someone trick it into revealing the secret?
 
-**Target 3 - Multi-agent system** (`agents.py`, `tools.py`): a Router Agent that classifies incoming requests and hands them to one of three specialist agents (Ticketing, Inventory, Escalation), each with its own role-based permissions and session-token verification between agents.
+**2. Document-search assistant** (`ingest.py`, `query.py`)
+Searches a mix of normal and confidential documents. Access is checked when documents are retrieved (`employee` vs `hr`), not just by telling the AI "don't share this", because instructions alone can be bypassed.
 
-## Key findings
+**3. Multi-agent system** (`agents.py`, `tools.py`)
+A Router agent reads each request and passes it to a Ticketing, Inventory or Escalation agent. Each agent has its own permissions, and agents must prove who they are with a session token before another agent will trust them.
 
-| # | Finding | Module | Severity | Status |
+Every security event is written to `security_events.jsonl` by `logger.py`, and `analyze.py` reads that log to spot attacks.
+
+## What I found
+
+| # | Issue | System | Severity | Status |
 |---|---|---|---|---|
-| R1 | Subtle "policy-framed" prompt injection caused the RAG assistant to fabricate document citations | B | Medium | Fixed & retested |
-| R2 | Cross-agent injection attempt against the Inventory Agent | C | High (attempted) | Blocked by existing role + untrusted-data checks |
-| R3 | Agent impersonation — a forged `sender` field returned real inventory data with no identity verification | C | Critical | **Fixed & retested** (see traceability diagram) |
-| R4 | Confused deputy — a malicious instruction embedded in ticket content, no active exploit yet but a real latent attack surface | C | Low (latent) | Identified, documented |
+| R1 | A prompt disguised as a "policy" made the document assistant make up fake citations | 2 | Medium | Fixed & re-tested |
+| R2 | One agent tried to inject instructions into the Inventory agent | 3 | High (attempted) | Blocked by existing checks |
+| R3 | Faking the `sender` field let anyone pose as another agent and get real inventory data | 3 | Critical | **Fixed & re-tested** |
+| R4 | A malicious instruction hidden inside ticket text could be followed later | 3 | Low (not exploited yet) | Documented |
 
-## What I built vs. what the tools did
-
-- **Built myself:** the chatbot, RAG pipeline, multi-agent system and its permission/token logic, all attack scripts, the logging and analysis layer, the risk register and traceability mapping.
-- **Used existing tools:** Garak and PyRIT for automated LLM vulnerability scanning (Module A), ChromaDB and sentence-transformers for the RAG vector store (Module B).
+**R3 was the most serious.** Agents trusted each other based only on a name in the message, so I added session-token checks between agents, then re-ran the attack to confirm it was blocked.
 
 ## How to run it
 
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install requests garak pyrit chromadb sentence-transformers pandas
+1. Install [Ollama](https://ollama.com) and download the model:
+   ```bash
+   ollama pull llama3.1:8b
+   ```
+2. Install the Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run each system:
+   ```bash
+   python chatbot.py                       # 1. support chatbot
+   python ingest.py && python query.py     # 2. document search
+   python agents.py                        # 3. multi-agent system
+   python analyze.py                       # read the security log
+   ```
 
-ollama pull llama3.1:8b
-ollama serve  # in a separate terminal
+## What I built vs. what the tools did
 
-python chatbot.py      
-python ingest.py        
-python query.py        
-python agents.py        
-python analyze.py      
-```
+- **I built:** the chatbot, the document-search pipeline, the multi-agent system and its permission and token checks, all the attack scripts, the logging, the risk register and the traceability mapping.
+- **Existing tools:** Garak and PyRIT for automated vulnerability scanning; ChromaDB and sentence-transformers for document search.

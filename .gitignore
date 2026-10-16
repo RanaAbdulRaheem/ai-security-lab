@@ -1,4 +1,3 @@
-@"
 .env
 *.env
 venv/
@@ -8,4 +7,3 @@ __pycache__/
 *.bin
 *.safetensors
 models/
-"@ | Out-File -Encoding utf8 .gitignore
